@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examples and Tutorials</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('basics') }}">Machine Learning Basics</a></li>
+                <li><a href="{{ url_for('training') }}">Training Models</a></li>
+                <li><a href="{{ url_for('examples') }}">Examples and Tutorials</a></li>
+                <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>Examples and Tutorials</h1>
+
+        <h2>Machine Learning Basics</h2>
+        <p>Understanding the foundational concepts of machine learning is essential. Watch the video below to get an introduction to key concepts:</p>
+        <video width="640" height="360" controls>
+            <source src="{{ url_for('static', filename='videos/basic_concepts.mp4') }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <h2>Training Models</h2>
+        <p>Learn how to train machine learning models by watching the following tutorial:</p>
+        <video width="640" height="360" controls>
+            <source src="{{ url_for('static', filename='videos/training_models.mp4') }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <p>Additional examples and interactive tutorials will help solidify your understanding of machine learning:</p>
+
+        <h3>Supervised Learning Example</h3>
+        <p>Watch this example to understand how supervised learning works:</p>
+        <video width="640" height="360" controls>
+            <source src="{{ url_for('static', filename='videos/supervised_learning.mp4') }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <h3>Unsupervised Learning Example</h3>
+        <p>Watch this example to understand how unsupervised learning works:</p>
+        <video width="640" height="360" controls>
+            <source src="{{ url_for('static', filename='videos/unsupervised_learning.mp4') }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <h3>Reinforcement Learning Example</h3>
+        <p>Watch this example to understand how reinforcement learning works:</p>
+        <video width="640" height="360" controls>
+            <source src="{{ url_for('static', filename='videos/reinforcement_learning.mp4') }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </main>
+    <footer>
+        <p>&copy; 2024 Machine Learning Basics. All rights reserved.</p>
+    </footer>
+</body>
+</html>

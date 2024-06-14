@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('basics') }}">Machine Learning Basics</a></li>
+                <li><a href="{{ url_for('training') }}">Training Models</a></li>
+                <li><a href="{{ url_for('examples') }}">Examples and Tutorials</a></li>
+                <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+                <li><a href="{{ url_for('register') }}">Register</a></li>
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>Register</h1>
+        <form method="POST" action="{{ url_for('register') }}">
+            {{ form.hidden_tag() }}
+            <div>
+                {{ form.username.label }} {{ form.username(size=32) }}
+                {% for error in form.username.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div>
+                {{ form.email.label }} {{ form.email(size=32) }}
+                {% for error in form.email.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div>
+                {{ form.password.label }} {{ form.password(size=32) }}
+                {% for error in form.password.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div>
+                {{ form.confirm_password.label }} {{ form.confirm_password(size=32) }}
+                {% for error in form.confirm_password.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div>
+                {{ form.submit() }}
+            </div>
+        </form>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </main>
+    <footer>
+        <p>&copy; 2024 Beyond Vision - Machine Learning Basics. All rights reserved.</p>
+    </footer>
+</body>
+</html>

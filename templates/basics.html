@@ -13,6 +13,7 @@
                 <li><a href="{{ url_for('index') }}">Home</a></li>
                 <li><a href="{{ url_for('basics') }}">Machine Learning Basics</a></li>
                 <li><a href="{{ url_for('training') }}">Training Models</a></li>
+                <li><a href="{{ url_for('view_results') }}">Results</a></li>
                 <li><a href="{{ url_for('examples') }}">Examples and Tutorials</a></li>
                 <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
                 {% if current_user.is_authenticated %}
@@ -20,16 +21,56 @@
                 {% else %}
                     <li><a href="{{ url_for('register') }}">Register</a></li>
                     <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
                 {% endif %}
             </ul>
         </nav>
     </header>
     <main>
         <h1>Machine Learning Basics</h1>
-        <p>Introduction to basic concepts of machine learning.</p>
+
+        <section id="introduction">
+            <h2>Introduction to Machine Learning</h2>
+            <p>Machine Learning is a field of artificial intelligence that focuses on the development of algorithms and statistical models that enable computers to learn and make decisions from data. These models improve their performance on tasks over time without being explicitly programmed.</p>
+        </section>
+
+        <section id="types-of-machine-learning">
+            <h2>Types of Machine Learning</h2>
+            <p>Machine Learning can be broadly categorized into three types:</p>
+            <ul>
+                <li><strong>Supervised Learning</strong>: The model is trained on labeled data, which means the input data is paired with the correct output. The goal is to learn a mapping from inputs to outputs. Examples include regression and classification.</li>
+                <li><strong>Unsupervised Learning</strong>: The model is trained on unlabeled data and must find patterns and relationships within the data. Examples include clustering and dimensionality reduction.</li>
+                <li><strong>Reinforcement Learning</strong>: The model learns by interacting with an environment, receiving rewards or penalties based on its actions. The goal is to learn a strategy to maximize the cumulative reward. Examples include game playing and robotic control.</li>
+            </ul>
+        </section>
+
+        <section id="key-concepts">
+            <h2>Key Concepts in Machine Learning</h2>
+            <p>Some key concepts in machine learning include:</p>
+            <ul>
+                <li><strong>Features</strong>: Individual measurable properties or characteristics of the data.</li>
+                <li><strong>Labels</strong>: The output or target variable that the model aims to predict (used in supervised learning).</li>
+                <li><strong>Training</strong>: The process of teaching the model using a dataset, during which it learns the patterns in the data.</li>
+                <li><strong>Testing</strong>: The process of evaluating the performance of the model on a separate dataset that was not used during training.</li>
+                <li><strong>Overfitting</strong>: A situation where the model performs well on the training data but poorly on the testing data because it has learned the noise in the training data rather than the actual patterns.</li>
+                <li><strong>Underfitting</strong>: A situation where the model is too simple to capture the underlying patterns in the data, resulting in poor performance on both training and testing data.</li>
+            </ul>
+        </section>
+
+        <section id="applications">
+            <h2>Applications of Machine Learning</h2>
+            <p>Machine Learning is applied in various domains, including:</p>
+            <ul>
+                <li><strong>Healthcare</strong>: Disease prediction, personalized treatment, and medical imaging analysis.</li>
+                <li><strong>Finance</strong>: Fraud detection, algorithmic trading, and credit scoring.</li>
+                <li><strong>Marketing</strong>: Customer segmentation, recommendation systems, and sentiment analysis.</li>
+                <li><strong>Transportation</strong>: Autonomous driving, route optimization, and traffic prediction.</li>
+            </ul>
+        </section>
+
     </main>
     <footer>
-        <p>&copy; 2024 Beyond Vision - Machine Learning Basics. All rights reserved.</p>
+        <p>&copy; 2024 Machine Learning Basics. All rights reserved.</p>
     </footer>
 </body>
 </html>

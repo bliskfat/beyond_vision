@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Machine Learning Basics</title>
+    <title>Machine Learning Presentation</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 </head>
 <body>
     <header>
         <nav>
             <ul>
-                <li><a href="{{ url_for('index') }}">Home</a></li>
-
+                <li><a href="{{ url_for('presentation') }}">Presentation</a></li>
                 {% if current_user.is_authenticated %}
-
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
                     <li><a href="{{ url_for('basics') }}">Machine Learning Basics</a></li>
                     <li><a href="{{ url_for('training') }}">Training Models</a></li>
                     <li><a href="{{ url_for('view_results') }}">Results</a></li>
@@ -22,24 +20,21 @@
                     <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>
                 {% else %}
-                    <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
                     <li><a href="{{ url_for('login') }}">Login</a></li>
-                    <li><a href="{{ url_for('register') }}">Register</a></li>
-
                 {% endif %}
             </ul>
         </nav>
     </header>
     <main>
-        <h1>Welcome to Machine Learning Basics</h1>
-        <p>Learn the fundamentals of machine learning and how to train your own models.</p>
-
+        <h1>Welcome to the Machine Learning Presentation</h1>
+        <p>This is a brief introduction to machine learning concepts and applications.</p>
         <div id="ml-animation"></div>
     </main>
     <footer>
         <p>&copy; 2024 Machine Learning Basics. All rights reserved.</p>
     </footer>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <script src="{{ url_for('static', filename='ml_animation.js') }}"></script>
 </body>
 </html>

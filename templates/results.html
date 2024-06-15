@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('basics') }}">Machine Learning Basics</a></li>
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('training') }}">Training Models</a></li>
+                    <li><a href="{{ url_for('view_results') }}">Results</a></li>
+                    <li><a href="{{ url_for('examples') }}">Examples and Tutorials</a></li>
+                    <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                    <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>Training Results</h1>
+        <p>Compare the results of different neural network configurations.</p>
+
+        <div id="results-container">
+            {% for result in results %}
+                <div class="result">
+                    <h3>Configuration {{ loop.index }}</h3>
+                    <p>Epochs: {{ result.epochs }}</p>
+                    <p>Learning Rate: {{ result.learning_rate }}</p>
+                    <p>Layers: {{ result.layers }}</p>
+                    <p>Neurons per Layer: {{ result.neurons }}</p>
+                    <div id="loss-plot-{{ result.id }}"></div>
+                    <div id="accuracy-plot-{{ result.id }}"></div>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Machine Learning Basics. All rights reserved.</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% for result in results %}
+                const loss = JSON.parse('{{ result.loss | tojson | safe }}');
+                const accuracy = JSON.parse('{{ result.accuracy | tojson | safe }}');
+                const epochsArray = Array.from({ length: loss.length }, (v, k) => k + 1);
+
+                // Plot the training loss
+                Plotly.newPlot('loss-plot-{{ result.id }}', [{
+                    x: epochsArray,
+                    y: loss,
+                    type: 'scatter',
+                    name: 'Loss'
+                }], {
+                    title: 'Training Loss',
+                    xaxis: { title: 'Epoch' },
+                    yaxis: { title: 'Loss' }
+                });
+
+                // Plot the training accuracy
+                Plotly.newPlot('accuracy-plot-{{ result.id }}', [{
+                    x: epochsArray,
+                    y: accuracy,
+                    type: 'scatter',
+                    name: 'Accuracy'
+                }], {
+                    title: 'Training Accuracy',
+                    xaxis: { title: 'Epoch' },
+                    yaxis: { title: 'Accuracy' }
+                });
+            {% endfor %}
+        });
+    </script>
+</body>
+</html>

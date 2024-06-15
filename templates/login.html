@@ -11,12 +11,22 @@
         <nav>
             <ul>
                 <li><a href="{{ url_for('index') }}">Home</a></li>
-                <li><a href="{{ url_for('basics') }}">Machine Learning Basics</a></li>
-                <li><a href="{{ url_for('training') }}">Training Models</a></li>
-                <li><a href="{{ url_for('examples') }}">Examples and Tutorials</a></li>
-                <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
-                <li><a href="{{ url_for('register') }}">Register</a></li>
-                <li><a href="{{ url_for('login') }}">Login</a></li>
+
+                {% if current_user.is_authenticated %}
+
+                    <li><a href="{{ url_for('basics') }}">Machine Learning Basics</a></li>
+                    <li><a href="{{ url_for('training') }}">Training Models</a></li>
+                    <li><a href="{{ url_for('view_results') }}">Results</a></li>
+                    <li><a href="{{ url_for('examples') }}">Examples and Tutorials</a></li>
+                    <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+
+
+                {% endif %}
             </ul>
         </nav>
     </header>

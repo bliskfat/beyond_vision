@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Models</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('basics') }}">Machine Learning Basics</a></li>
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('training') }}">Training Models</a></li>
+                    <li><a href="{{ url_for('view_results') }}">Results</a></li>
+                    <li><a href="{{ url_for('examples') }}">Examples and Tutorials</a></li>
+                    <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                    <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>Training Machine Learning Models</h1>
+        <p>Learn how to train your own machine learning models with various techniques and algorithms.</p>
+
+        <section id="step-by-step-guide">
+            <h2>Step-by-Step Guide to Training a Machine Learning Model</h2>
+            <main>
+        <h1>Training Machine Learning Models</h1>
+        <p>Learn how to train your own machine learning models with various techniques and algorithms.</p>
+
+        <section id="step-by-step-guide">
+            <h2>Step-by-Step Guide to Training a Machine Learning Model</h2>
+
+            <h3>Step 1: Define the Problem</h3>
+            <p>Start by understanding and defining the problem you are trying to solve. This includes identifying the input data and the expected output. For example, predicting house prices based on features like size, location, and number of rooms.</p>
+
+            <h3>Step 2: Gather Data</h3>
+            <p>Collect the data needed to train your model. This data should be representative of the problem you are trying to solve. Ensure the data is clean, relevant, and sufficient in quantity.</p>
+
+            <h3>Step 3: Prepare Data</h3>
+            <p>Prepare your data for training by performing the following tasks:</p>
+            <ul>
+                <li><strong>Cleaning:</strong> Remove or correct any errors or inconsistencies in the data.</li>
+                <li><strong>Formatting:</strong> Ensure the data is in a format suitable for the machine learning algorithm you plan to use.</li>
+                <li><strong>Splitting:</strong> Divide the data into training and testing sets. A common split is 80% for training and 20% for testing.</li>
+            </ul>
+
+            <h3>Step 4: Choose a Model</h3>
+            <p>Select an appropriate machine learning algorithm for your problem. Common algorithms include linear regression, decision trees, and neural networks. The choice of algorithm depends on the nature of the problem and the type of data you have.</p>
+
+            <h3>Step 5: Train the Model</h3>
+            <p>Use the training data to train your model. This involves feeding the data into the algorithm and allowing it to learn the patterns and relationships within the data. This step may require adjusting various parameters and hyperparameters to optimize performance.</p>
+
+            <h3>Step 6: Evaluate the Model</h3>
+            <p>Evaluate the performance of your model using the testing data. Common evaluation metrics include accuracy, precision, recall, and F1 score. This step helps you understand how well your model generalizes to new, unseen data.</p>
+
+            <h3>Step 7: Tune the Model</h3>
+            <p>If the model's performance is not satisfactory, you may need to tune it. This involves experimenting with different algorithms, adjusting parameters, and improving data preprocessing techniques.</p>
+
+            <h3>Step 8: Deploy the Model</h3>
+            <p>Once you are satisfied with the model's performance, you can deploy it to a production environment where it can make predictions on new data. This may involve integrating the model into a larger system or application.</p>
+
+            <h3>Step 9: Monitor and Maintain the Model</h3>
+            <p>After deployment, continuously monitor the model's performance to ensure it remains accurate over time. This involves tracking metrics, updating the model with new data, and retraining as necessary.</p>
+
+            <h3>Example Code</h3>
+            <p>Here is an example of training a simple linear regression model using Python and the scikit-learn library:</p>
+
+            <h2>Interactive Neural Network Training</h2>
+            <form id="training-form">
+                <label for="epochs">Epochs:</label>
+                <input type="number" id="epochs" name="epochs" value="50">
+                <label for="learning_rate">Learning Rate:</label>
+                <input type="number" id="learning_rate" name="learning_rate" value="0.01" step="0.001">
+                <label for="layers">Number of Layers:</label>
+                <input type="number" id="layers" name="layers" value="2">
+                <label for="neurons">Neurons per Layer:</label>
+                <input type="number" id="neurons" name="neurons" value="10">
+                <button type="submit">Train</button>
+            </form>
+            <div id="loss-plot"></div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Machine Learning Basics. All rights reserved.</p>
+    </footer>
+    <script>
+        document.getElementById('training-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const epochs = document.getElementById('epochs').value;
+            const learning_rate = document.getElementById('learning_rate').value;
+            const layers = document.getElementById('layers').value;
+            const neurons = document.getElementById('neurons').value;
+
+            fetch('/train', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ epochs, learning_rate, layers, neurons })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const losses = data.loss;
+                const epochsArray = Array.from({ length: losses.length }, (v, k) => k + 1);
+
+                Plotly.newPlot('loss-plot', [{
+                    x: epochsArray,
+                    y: losses,
+                    type: 'scatter'
+                }], {
+                    title: 'Training Loss',
+                    xaxis: { title: 'Epoch' },
+                    yaxis: { title: 'Loss' }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,16 +1,15 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, login_user, current_user, logout_user, login_required
+from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user, login_required
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import Callback
-from datetime import datetime
 import numpy as np
 import json
-from forms import RegistrationForm, LoginForm
-from models import db, User, TrainingResult
 
 app = Flask(__name__)
 
@@ -20,15 +19,44 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db.init_app(app)
+db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(60), nullable=False)
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+class RegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Sign Up')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError('That username is taken. Please choose a different one.')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError('That email is taken. Please choose a different one.')
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Login')
 
 @app.route("/presentation")
 def presentation():
@@ -81,7 +109,7 @@ def basics():
 @app.route("/training")
 @login_required
 def training():
-    return render_template('training.html')
+    return render_template('training_test.html')
 
 @app.route("/examples")
 @login_required
@@ -93,20 +121,8 @@ def examples():
 def contact():
     return render_template('contact.html')
 
-class TrainingProgress(Callback):
-    def __init__(self):
-        self.progress = []
-        self.losses = []
-        self.accuracies = []
-
-    def on_epoch_end(self, epoch, logs=None):
-        self.progress.append((epoch, logs['loss'], logs['accuracy']))
-        self.losses.append(logs['loss'])
-        self.accuracies.append(logs['accuracy'])
-
 @app.route('/train', methods=['POST'])
-@login_required
-def train_model():
+def train():
     data = request.get_json()
     epochs = int(data['epochs'])
     learning_rate = float(data['learning_rate'])
@@ -114,49 +130,23 @@ def train_model():
     neurons = int(data['neurons'])
 
     # Generate dummy data
-    X = np.random.rand(1000, 1)
-    y = (2 * X + 1 + np.random.normal(0, 0.1, (1000, 1)) > 2.5).astype(int)  # Binary classification
+    X = np.random.rand(100, 1)
+    y = 2 * X + 1 + np.random.normal(0, 0.1, (100, 1))
 
     # Build the model
     model = Sequential()
     model.add(Dense(neurons, input_dim=1, activation='relu'))
     for _ in range(layers - 1):
         model.add(Dense(neurons, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))
+    model.add(Dense(1))
 
-    model.compile(optimizer=Adam(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['accuracy'])
-
-    # Initialize the callback to track progress
-    progress_callback = TrainingProgress()
+    model.compile(optimizer=Adam(learning_rate=learning_rate), loss='mean_squared_error')
 
     # Train the model
-    model.fit(X, y, epochs=epochs, verbose=0, callbacks=[progress_callback])
+    history = model.fit(X, y, epochs=epochs, verbose=0)
 
-    # Save the training result to the database
-    result = TrainingResult(
-        user_id=current_user.id,
-        epochs=epochs,
-        learning_rate=learning_rate,
-        layers=layers,
-        neurons=neurons,
-        loss=json.dumps(progress_callback.losses),
-        accuracy=json.dumps(progress_callback.accuracies)
-    )
-    db.session.add(result)
-    db.session.commit()
-
-    # Return the training loss and accuracy
-    return jsonify({
-        'loss': progress_callback.losses,
-        'accuracy': progress_callback.accuracies,
-        'progress': progress_callback.progress
-    })
-
-@app.route('/results', methods=['GET'])
-@login_required
-def view_results():
-    results = TrainingResult.query.filter_by(user_id=current_user.id).all()
-    return render_template('results.html', results=results)
+    # Return the training loss
+    return jsonify({'loss': history.history['loss']})
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -88,3 +88,144 @@ form button:hover {
     color: blue;
     font-weight: bold;
 }
+
+/* styles.css */
+
+/* Basic styles for the page */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Styles for the header and navigation */
+header {
+    background-color: #333;
+    color: white;
+    position: fixed; /* Make the header fixed */
+    width: 100%; /* Full width */
+    top: 0; /* Position at the top */
+    z-index: 1000; /* Ensure it stays on top */
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin: 0 1rem;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+/* Add padding to the main content to avoid overlap with fixed header */
+main {
+    padding-top: 70px; /* Adjust this value based on the height of your header */
+}
+
+/* Style for the main content */
+main h1 {
+    margin-top: 0;
+}
+
+/* Example section styles */
+section {
+    padding: 2rem;
+}
+
+
+/* Basic styles for the page */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Styles for the header and navigation */
+header {
+    background-color: #333;
+    color: white;
+    position: fixed; /* Make the header fixed */
+    width: 100%; /* Full width */
+    top: 0; /* Position at the top */
+    z-index: 1000; /* Ensure it stays on top */
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin: 0 1rem;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+/* Active link styling */
+nav ul li a.active {
+    color: yellow; /* Change this to your desired active color */
+}
+
+/* Add padding to the main content to avoid overlap with fixed header */
+main {
+    padding-top: 70px; /* Adjust this value based on the height of your header */
+}
+
+/* Style for the main content */
+main h1 {
+    margin-top: 0;
+}
+
+/* Example section styles */
+section {
+    padding: 2rem;
+}
+
+/* Styles for the footer */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 0.5rem; /* Smaller padding for the footer */
+    position: fixed; /* Fix the footer at the bottom */
+    bottom: 0;
+    width: 100%;
+    height: 40px; /* Adjust the height as needed */
+    font-size: 0.8rem; /* Smaller font size for the footer */
+}

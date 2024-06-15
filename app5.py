@@ -81,7 +81,7 @@ def basics():
 @app.route("/training")
 @login_required
 def training():
-    return render_template('training.html')
+    return render_template('training_test.html')
 
 @app.route("/examples")
 @login_required
@@ -105,8 +105,7 @@ class TrainingProgress(Callback):
         self.accuracies.append(logs['accuracy'])
 
 @app.route('/train', methods=['POST'])
-@login_required
-def train_model():
+def train():
     data = request.get_json()
     epochs = int(data['epochs'])
     learning_rate = float(data['learning_rate'])
@@ -154,7 +153,7 @@ def train_model():
 
 @app.route('/results', methods=['GET'])
 @login_required
-def view_results():
+def results():
     results = TrainingResult.query.filter_by(user_id=current_user.id).all()
     return render_template('results.html', results=results)
 

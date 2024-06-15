@@ -1,16 +1,20 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, login_user, current_user, logout_user, login_required
+from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user, login_required
+from flask_wtf import FlaskForm
+from werkzeug.utils import redirect
+from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import Callback
-from datetime import datetime
 import numpy as np
+from datetime import datetime
 import json
-from forms import RegistrationForm, LoginForm
-from models import db, User, TrainingResult
+
+from models import TrainingResult
 
 app = Flask(__name__)
 
@@ -20,15 +24,44 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db.init_app(app)
+db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(60), nullable=False)
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+class RegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Sign Up')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError('That username is taken. Please choose a different one.')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError('That email is taken. Please choose a different one.')
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Login')
 
 @app.route("/presentation")
 def presentation():
@@ -81,7 +114,7 @@ def basics():
 @app.route("/training")
 @login_required
 def training():
-    return render_template('training.html')
+    return render_template('training3.html')
 
 @app.route("/examples")
 @login_required
@@ -105,8 +138,7 @@ class TrainingProgress(Callback):
         self.accuracies.append(logs['accuracy'])
 
 @app.route('/train', methods=['POST'])
-@login_required
-def train_model():
+def train():
     data = request.get_json()
     epochs = int(data['epochs'])
     learning_rate = float(data['learning_rate'])
@@ -154,9 +186,10 @@ def train_model():
 
 @app.route('/results', methods=['GET'])
 @login_required
-def view_results():
+def results():
     results = TrainingResult.query.filter_by(user_id=current_user.id).all()
     return render_template('results.html', results=results)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

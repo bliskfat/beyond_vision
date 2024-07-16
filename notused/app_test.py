@@ -8,6 +8,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 
+from models import TrainingResult
+
 app = Flask(__name__)
 
 # Secret key for sessions
@@ -115,6 +117,12 @@ def examples():
 @login_required
 def contact():
     return render_template('contact.html')
+
+@app.route('/results', methods=['GET'])
+@login_required
+def view_results():
+    results = TrainingResult.query.filter_by(user_id=current_user.id).all()
+    return render_template('results.html', results=results)
 
 if __name__ == '__main__':
     app.run(debug=True)

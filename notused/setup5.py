@@ -1,4 +1,4 @@
-from app5 import create_app, db
+from notused.app5 import create_app, db
 
 app = create_app()
 

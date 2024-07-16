@@ -20,5 +20,4 @@ class TrainingResult(db.Model):
     loss = db.Column(db.Text, nullable=False)
     accuracy = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
     user = db.relationship('User', backref=db.backref('training_result', lazy=True))

@@ -5,23 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Training Models</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <header>
         <nav>
             <ul>
-                <li><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Home</a></li>
-                <li><a href="{{ url_for('basics') }}" class="{% if request.endpoint == 'basics' %}active{% endif %}">Machine Learning Basics</a></li>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('basics') }}">Machine Learning Basics</a></li>
                 {% if current_user.is_authenticated %}
-                    <li><a href="{{ url_for('training') }}" class="{% if request.endpoint == 'training' %}active{% endif %}">Training Models</a></li>
-                    <li><a href="{{ url_for('examples') }}" class="{% if request.endpoint == 'examples' %}active{% endif %}">Examples and Tutorials</a></li>
-                    <li><a href="{{ url_for('contact') }}" class="{% if request.endpoint == 'contact' %}active{% endif %}">Contact Us</a></li>
-                    <li><a href="{{ url_for('view_results') }}" class="{% if request.endpoint == 'view_results' %}active{% endif %}">Results</a></li>
+                    <li><a href="{{ url_for('training') }}">Training Models</a></li>
+                    <li><a href="{{ url_for('view_results') }}">Results</a></li>
+                    <li><a href="{{ url_for('examples') }}">Examples and Tutorials</a></li>
+                    <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>
                 {% else %}
-                    <li><a href="{{ url_for('register') }}" class="{% if request.endpoint == 'register' %}active{% endif %}">Register</a></li>
-                    <li><a href="{{ url_for('contact') }}" class="{% if request.endpoint == 'contact' %}active{% endif %}">Contact Us</a></li>
-                    <li><a href="{{ url_for('login') }}" class="{% if request.endpoint == 'login' %}active{% endif %}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                    <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
                 {% endif %}
             </ul>
         </nav>
@@ -32,93 +33,252 @@
 
         <section id="step-by-step-guide">
             <h2>Step-by-Step Guide to Training a Machine Learning Model</h2>
-            <!-- Your content here -->
+            <!-- Existing guide content here -->
 
-            <div id="training-form">
-                <form id="trainForm">
-                    <label for="epochs">Epochs:</label>
-                    <input type="number" id="epochs" name="epochs" value="50"><br><br>
-                    <label for="learning_rate">Learning Rate:</label>
-                    <input type="number" id="learning_rate" name="learning_rate" step="0.001" value="0.01"><br><br>
-                    <label for="layers">Layers:</label>
-                    <input type="number" id="layers" name="layers" value="2"><br><br>
-                    <label for="neurons">Neurons:</label>
-                    <input type="number" id="neurons" name="neurons" value="10"><br><br>
-                    <input type="submit" value="Train Model">
-                </form>
-                <div id="training-status">
-                    <progress id="training-progress" value="0" max="100"></progress>
-                    <p id="training-message"></p>
-                </div>
-                <div id="training-results">
-                    <h3>Training Results</h3>
-                    <div id="loss-graph"></div>
-                    <div id="accuracy-graph"></div>
-                </div>
+            <h3>Step 1: Define the Problem</h3>
+            <p>Start by understanding and defining the problem you are trying to solve. This includes identifying the input data and the expected output. For example, predicting house prices based on features like size, location, and number of rooms.</p>
+
+            <h3>Step 2: Gather Data</h3>
+            <p>Collect the data needed to train your model. This data should be representative of the problem you are trying to solve. Ensure the data is clean, relevant, and sufficient in quantity.</p>
+
+            <h3>Step 3: Prepare Data</h3>
+            <p>Prepare your data for training by performing the following tasks:</p>
+            <ul>
+                <li><strong>Cleaning:</strong> Remove or correct any errors or inconsistencies in the data.</li>
+                <li><strong>Formatting:</strong> Ensure the data is in a format suitable for the machine learning algorithm you plan to use.</li>
+                <li><strong>Splitting:</strong> Divide the data into training and testing sets. A common split is 80% for training and 20% for testing.</li>
+            </ul>
+
+            <h3>Step 4: Choose a Model</h3>
+            <p>Select an appropriate machine learning algorithm for your problem. Common algorithms include linear regression, decision trees, and neural networks. The choice of algorithm depends on the nature of the problem and the type of data you have.</p>
+
+            <h3>Step 5: Train the Model</h3>
+            <p>Use the training data to train your model. This involves feeding the data into the algorithm and allowing it to learn the patterns and relationships within the data. This step may require adjusting various parameters and hyperparameters to optimize performance.</p>
+
+            <h3>Step 6: Evaluate the Model</h3>
+            <p>Evaluate the performance of your model using the testing data. Common evaluation metrics include accuracy, precision, recall, and F1 score. This step helps you understand how well your model generalizes to new, unseen data.</p>
+
+            <h3>Step 7: Tune the Model</h3>
+            <p>If the model's performance is not satisfactory, you may need to tune it. This involves experimenting with different algorithms, adjusting parameters, and improving data preprocessing techniques.</p>
+
+            <h3>Step 8: Deploy the Model</h3>
+            <p>Once you are satisfied with the model's performance, you can deploy it to a production environment where it can make predictions on new data. This may involve integrating the model into a larger system or application.</p>
+
+            <h3>Step 9: Monitor and Maintain the Model</h3>
+            <p>After deployment, continuously monitor the model's performance to ensure it remains accurate over time. This involves tracking metrics, updating the model with new data, and retraining as necessary.</p>
+
+            <h3>Example Code</h3>
+            <p>Here is an example of training a simple linear regression model using Python and the scikit-learn library:</p>
+                       <pre>
+<code class="language-python">
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+
+# Step 2: Gather Data
+# Example dataset: predicting house prices based on size
+X = np.array([[1400], [1600], [1700], [1875], [1100], [1550], [2350], [2450], [1425], [1700]])
+y = np.array([245000, 312000, 279000, 308000, 199000, 219000, 405000, 324000, 319000, 255000])
+
+# Step 3: Prepare Data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Step 4: Choose a Model
+model = LinearRegression()
+
+# Step 5: Train the Model
+model.fit(X_train, y_train)
+
+# Step 6: Evaluate the Model
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+print(f"Mean Squared Error: {mse}")
+
+# Step 8: Deploy the Model (example prediction)
+new_house_size = np.array([[1500]])
+predicted_price = model.predict(new_house_size)
+print(f"Predicted Price for a house of size 1500: ${predicted_price[0]:,.2f}")
+</code>
+            </pre>
+
+            <h2>Interactive Neural Network Training</h2>
+            <form id="training-form">
+                <label for="epochs">Epochs:</label>
+                <input type="number" id="epochs" name="epochs" value="50">
+                <label for="learning_rate">Learning Rate:</label>
+                <input type="number" id="learning_rate" name="learning_rate" value="0.01" step="0.001">
+                <label for="layers">Number of Layers:</label>
+                <input type="number" id="layers" name="layers" value="2">
+                <label for="neurons">Neurons per Layer:</label>
+                <input type="number" id="neurons" name="neurons" value="10">
+                <button type="submit">Train</button>
+            </form>
+            <div id="progress-bar">
+                <div id="progress" style="width: 0%; background-color: green; text-align: center; color: white;">0%</div>
             </div>
+            <div id="loss-plot"></div>
+            <div id="accuracy-plot"></div>
+            <div id="precision-plot"></div>
+            <div id="recall-plot"></div>
+            <div id="f1-score-plot"></div>
+            <div id="comparison-results"></div>
         </section>
     </main>
     <footer>
-        <p>&copy; 2024 Machine Learning Basics. All rights reserved.</p>
+        <p>&copy; 2024 Beyond Vision - Machine Learning Basics. All rights reserved.</p>
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.getElementById('trainForm').onsubmit = async function(event) {
-            event.preventDefault();
-            const form = event.target;
-            const epochs = form.epochs.value;
-            const learning_rate = form.learning_rate.value;
-            const layers = form.layers.value;
-            const neurons = form.neurons.value;
+        const results = [];
 
-            const response = await fetch('/train', {
+        document.getElementById('training-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const epochs = document.getElementById('epochs').value;
+            const learning_rate = document.getElementById('learning_rate').value;
+            const layers = document.getElementById('layers').value;
+            const neurons = document.getElementById('neurons').value;
+
+            fetch('/train', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    epochs: epochs,
-                    learning_rate: learning_rate,
-                    layers: layers,
-                    neurons: neurons
-                })
+                body: JSON.stringify({ epochs, learning_rate, layers, neurons })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const losses = data.loss;
+                const accuracies = data.accuracy;
+                const precisions = data.precision;
+                const recalls = data.recall;
+                const f1_scores = data.f1_score;
+                const config = data.config;
+                const epochsArray = Array.from({ length: losses.length }, (v, k) => k + 1);
+
+                results.push({
+                    config: config,
+                    losses: losses,
+                    accuracies: accuracies,
+                    precisions: precisions,
+                    recalls: recalls,
+                    f1_scores: f1_scores
+                });
+
+                // Update the progress bar
+                data.progress.forEach(([epoch, loss, accuracy]) => {
+                    const percentage = ((epoch + 1) / epochs) * 100;
+                    document.getElementById('progress').style.width = percentage + '%';
+                    document.getElementById('progress').textContent = Math.round(percentage) + '%';
+                });
+
+                // Plot the training loss
+                Plotly.newPlot('loss-plot', [{
+                    x: epochsArray,
+                    y: losses,
+                    type: 'scatter',
+                    name: 'Loss'
+                }], {
+                    title: 'Training Loss',
+                    xaxis: { title: 'Epoch' },
+                    yaxis: { title: 'Loss' }
+                });
+
+                // Plot the training accuracy
+                Plotly.newPlot('accuracy-plot', [{
+                    x: epochsArray,
+                    y: accuracies,
+                    type: 'scatter',
+                    name: 'Accuracy'
+                }], {
+                    title: 'Training Accuracy',
+                    xaxis: { title: 'Epoch' },
+                    yaxis: { title: 'Accuracy' }
+                });
+
+                // Plot the training precision
+                Plotly.newPlot('precision-plot', [{
+                    x: epochsArray,
+                    y: precisions,
+                    type: 'scatter',
+                    name: 'Precision'
+                }], {
+                    title: 'Training Precision',
+                    xaxis: { title: 'Epoch' },
+                    yaxis: { title: 'Precision' }
+                });
+
+                // Plot the training recall
+                Plotly.newPlot('recall-plot', [{
+                    x: epochsArray,
+                    y: recalls,
+                    type: 'scatter',
+                    name: 'Recall'
+                }], {
+                    title: 'Training Recall',
+                    xaxis: { title: 'Epoch' },
+                    yaxis: { title: 'Recall' }
+                });
+
+                // Plot the training F1 score
+                Plotly.newPlot('f1-score-plot', [{
+                    x: epochsArray,
+                    y: f1_scores,
+                    type: 'scatter',
+                    name: 'F1 Score'
+                }], {
+                    title: 'Training F1 Score',
+                    xaxis: { title: 'Epoch' },
+                    yaxis: { title: 'F1 Score' }
+                });
+
+                // Update the comparison results
+                updateComparisonResults();
             });
-            const data = await response.json();
+        });
 
-            const progressElem = document.getElementById('training-progress');
-            const messageElem = document.getElementById('training-message');
-            const lossGraphElem = document.getElementById('loss-graph');
-            const accuracyGraphElem = document.getElementById('accuracy-graph');
+        function updateComparisonResults() {
+            const comparisonDiv = document.getElementById('comparison-results');
+            comparisonDiv.innerHTML = '';
 
-            progressElem.value = 100;
-            messageElem.innerText = 'Training completed';
+            results.forEach((result, index) => {
+                const div = document.createElement('div');
+                div.className = 'result';
 
-            const lossChart = new Chart(lossGraphElem, {
-                type: 'line',
-                data: {
-                    labels: data.progress.map(p => p[0]),
-                    datasets: [{
-                        label: 'Loss',
-                        data: data.loss,
-                        borderColor: 'red',
-                        fill: false
-                    }]
-                }
+                div.innerHTML = `
+                    <h3>Configuration ${index + 1}</h3>
+                    <p>Epochs: ${result.config.epochs}</p>
+                    <p>Learning Rate: ${result.config.learning_rate}</p>
+                    <p>Layers: ${result.config.layers}</p>
+                    <p>Neurons per Layer: ${result.config.neurons}</p>
+                    <p>Final Loss: ${result.losses[result.losses.length - 1]}</p>
+                    <p>Final Accuracy: ${result.accuracies[result.accuracies.length - 1]}</p>
+                    <p>Final Precision: ${result.precisions[result.precisions.length - 1]}</p>
+                    <p>Final Recall: ${result.recalls[result.recalls.length - 1]}</p>
+                    <p>Final F1 Score: ${result.f1_scores[result.f1_scores.length - 1]}</p>
+                `;
+
+                comparisonDiv.appendChild(div);
             });
-
-            const accuracyChart = new Chart(accuracyGraphElem, {
-                type: 'line',
-                data: {
-                    labels: data.progress.map(p => p[0]),
-                    datasets: [{
-                        label: 'Accuracy',
-                        data: data.accuracy,
-                        borderColor: 'blue',
-                        fill: false
-                    }]
-                }
-            });
-        };
+        }
     </script>
+    <style>
+        #progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            margin: 20px 0;
+        }
+
+        #progress {
+            height: 30px;
+            line-height: 30px;
+        }
+
+        .result {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
 </body>
 </html>

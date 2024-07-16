@@ -1,15 +1,20 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user, login_required
 from flask_wtf import FlaskForm
+#from sklearn.metrics import precision_score, recall_score, f1_score
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import Callback
+#from sklearn.metrics import precision_score, recall_score, f1_score
 import numpy as np
 import json
+
+from models import TrainingResult
 
 app = Flask(__name__)
 
@@ -109,7 +114,7 @@ def basics():
 @app.route("/training")
 @login_required
 def training():
-    return render_template('training_test.html')
+    return render_template('training.html')
 
 @app.route("/examples")
 @login_required
@@ -121,6 +126,38 @@ def examples():
 def contact():
     return render_template('contact.html')
 
+class TrainingProgress(Callback):
+    def __init__(self):
+        self.progress = []
+        self.losses = []
+        self.accuracies = []
+        self.precisions = []
+        self.recalls = []
+        self.f1_scores = []
+        self.val_data = None
+
+    def on_epoch_end(self, epoch, logs=None):
+        self.progress.append((epoch, logs['loss'], logs['accuracy']))
+        self.losses.append(logs['loss'])
+        self.accuracies.append(logs['accuracy'])
+        if self.validation_data:
+            self.val_data = self.validation_data
+            y_pred = (self.model.predict(self.val_data[0]) > 0.5).astype(int)
+            y_true = self.val_data[1]
+            self.precisions.append(precision_score(y_true, y_pred))
+            self.recalls.append(recall_score(y_true, y_pred))
+            self.f1_scores.append(f1_score(y_true, y_pred))
+
+    def on_train_end(self, logs=None):
+        # Calculate additional metrics at the end of training
+        if self.val_data:
+            y_pred = (self.model.predict(self.val_data[0]) > 0.5).astype(int)
+            y_true = self.val_data[1]
+            self.precisions.append(precision_score(y_true, y_pred))
+            self.recalls.append(recall_score(y_true, y_pred))
+            self.f1_scores.append(f1_score(y_true, y_pred))
+
+
 @app.route('/train', methods=['POST'])
 def train():
     data = request.get_json()
@@ -130,23 +167,44 @@ def train():
     neurons = int(data['neurons'])
 
     # Generate dummy data
-    X = np.random.rand(100, 1)
-    y = 2 * X + 1 + np.random.normal(0, 0.1, (100, 1))
+    X = np.random.rand(1000, 1)
+    y = (2 * X + 1 + np.random.normal(0, 0.1, (1000, 1)) > 2.5).astype(int)  # Binary classification
 
     # Build the model
     model = Sequential()
     model.add(Dense(neurons, input_dim=1, activation='relu'))
     for _ in range(layers - 1):
         model.add(Dense(neurons, activation='relu'))
-    model.add(Dense(1))
+    model.add(Dense(1, activation='sigmoid'))
 
-    model.compile(optimizer=Adam(learning_rate=learning_rate), loss='mean_squared_error')
+    model.compile(optimizer=Adam(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['accuracy'])
+
+    # Initialize the callback to track progress
+    progress_callback = TrainingProgress()
 
     # Train the model
-    history = model.fit(X, y, epochs=epochs, verbose=0)
+    model.fit(X, y, epochs=epochs, verbose=0, validation_split=0.2, callbacks=[progress_callback])
 
-    # Return the training loss
-    return jsonify({'loss': history.history['loss']})
+    # Return the training loss and accuracy
+    return jsonify({
+        'loss': progress_callback.losses,
+        'accuracy': progress_callback.accuracies,
+        'precision': progress_callback.precisions,
+        'recall': progress_callback.recalls,
+        'f1_score': progress_callback.f1_scores,
+        'progress': progress_callback.progress,
+        'config': {
+            'epochs': epochs,
+            'learning_rate': learning_rate,
+            'layers': layers,
+            'neurons': neurons
+        }
+    })
+@app.route('/results', methods=['GET'])
+@login_required
+def view_results():
+    results = TrainingResult.query.filter_by(user_id=current_user.id).all()
+    return render_template('results.html', results=results)
 
 if __name__ == '__main__':
     app.run(debug=True)

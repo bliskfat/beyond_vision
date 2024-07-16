@@ -1,17 +1,14 @@
-from flask import Flask, render_template, request, jsonify, url_for
+from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user, login_required
 from flask_wtf import FlaskForm
-from werkzeug.utils import redirect
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import Callback
 import numpy as np
-from datetime import datetime
 import json
 
 from models import TrainingResult
@@ -114,7 +111,7 @@ def basics():
 @app.route("/training")
 @login_required
 def training():
-    return render_template('training3.html')
+    return render_template('training_test.html')
 
 @app.route("/examples")
 @login_required
@@ -126,17 +123,6 @@ def examples():
 def contact():
     return render_template('contact.html')
 
-class TrainingProgress(Callback):
-    def __init__(self):
-        self.progress = []
-        self.losses = []
-        self.accuracies = []
-
-    def on_epoch_end(self, epoch, logs=None):
-        self.progress.append((epoch, logs['loss'], logs['accuracy']))
-        self.losses.append(logs['loss'])
-        self.accuracies.append(logs['accuracy'])
-
 @app.route('/train', methods=['POST'])
 def train():
     data = request.get_json()
@@ -146,50 +132,30 @@ def train():
     neurons = int(data['neurons'])
 
     # Generate dummy data
-    X = np.random.rand(1000, 1)
-    y = (2 * X + 1 + np.random.normal(0, 0.1, (1000, 1)) > 2.5).astype(int)  # Binary classification
+    X = np.random.rand(100, 1)
+    y = 2 * X + 1 + np.random.normal(0, 0.1, (100, 1))
 
     # Build the model
     model = Sequential()
     model.add(Dense(neurons, input_dim=1, activation='relu'))
     for _ in range(layers - 1):
         model.add(Dense(neurons, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))
+    model.add(Dense(1))
 
-    model.compile(optimizer=Adam(learning_rate=learning_rate), loss='binary_crossentropy', metrics=['accuracy'])
-
-    # Initialize the callback to track progress
-    progress_callback = TrainingProgress()
+    model.compile(optimizer=Adam(learning_rate=learning_rate), loss='mean_squared_error')
 
     # Train the model
-    model.fit(X, y, epochs=epochs, verbose=0, callbacks=[progress_callback])
+    history = model.fit(X, y, epochs=epochs, verbose=0)
 
-    # Save the training result to the database
-    result = TrainingResult(
-        user_id=current_user.id,
-        epochs=epochs,
-        learning_rate=learning_rate,
-        layers=layers,
-        neurons=neurons,
-        loss=json.dumps(progress_callback.losses),
-        accuracy=json.dumps(progress_callback.accuracies)
-    )
-    db.session.add(result)
-    db.session.commit()
+    # Return the training loss
+    return jsonify({'loss': history.history['loss']})
 
-    # Return the training loss and accuracy
-    return jsonify({
-        'loss': progress_callback.losses,
-        'accuracy': progress_callback.accuracies,
-        'progress': progress_callback.progress
-    })
 
 @app.route('/results', methods=['GET'])
 @login_required
-def results():
+def view_results():
     results = TrainingResult.query.filter_by(user_id=current_user.id).all()
     return render_template('results.html', results=results)
-
 
 if __name__ == '__main__':
     app.run(debug=True)

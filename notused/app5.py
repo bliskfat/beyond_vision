@@ -153,7 +153,7 @@ def train():
 
 @app.route('/results', methods=['GET'])
 @login_required
-def results():
+def view_results():
     results = TrainingResult.query.filter_by(user_id=current_user.id).all()
     return render_template('results.html', results=results)
 
